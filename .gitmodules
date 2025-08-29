@@ -1,0 +1,6 @@
+[submodule "external/raylib"]
+	path = external/raylib
+	url = https://github.com/raysan5/raylib.git
+[submodule "external/boost-di"]
+	path = external/boost-di
+	url = https://github.com/boost-experimental/di.git
