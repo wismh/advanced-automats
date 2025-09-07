@@ -1,15 +1,16 @@
 #pragma once
+#include <memory>
 #include <random>
 #include <vector>
 
-#include "ExtendedWolframSimulation.h"
+#include "ExtendedTotalisticSimulation.h"
 #include "../ProgramConfig.h"
 #include "../SimulationBuffer.h"
 
 namespace Program {
 
-class ExtendedWolframSimulationBuffer : public SimulationBuffer {
-    std::unique_ptr<ExtendedWolframSimulation> _simulation;
+class ExtendedTotalisticSimulationBuffer : public SimulationBuffer {
+    std::unique_ptr<ExtendedTotalisticSimulation> _simulation;
     std::vector<std::shared_ptr<int[]>> _buffer;
     ProgramConfig _config;
 
@@ -29,14 +30,13 @@ class ExtendedWolframSimulationBuffer : public SimulationBuffer {
         state[width / 2] = 1;
     }
 public:
-    ExtendedWolframSimulationBuffer(
+    ExtendedTotalisticSimulationBuffer(
         const ProgramConfig& config,
         const int neighborsCount,
         const unsigned long long rule,
         const bool isRandomFirst
-    ):
-        _config(config)
-    {
+        ) : _config(config) {
+
         if (config.GridWidth() <= 0 || config.GridHeight() <= 0)
             throw std::invalid_argument("Invalid grid size");
 
@@ -50,7 +50,7 @@ public:
             InitRandomBuffer(config.GridWidth(), _buffer[0]) :
             InitCentralBuffer(config.GridWidth(), _buffer[0]);
 
-        _simulation = std::make_unique<ExtendedWolframSimulation>(
+        _simulation = std::make_unique<ExtendedTotalisticSimulation>(
             config.GridWidth(),
             neighborsCount,
             rule,

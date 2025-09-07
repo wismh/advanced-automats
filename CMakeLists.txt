@@ -15,6 +15,10 @@ add_executable(${PROJECT_NAME} app/main.cpp
         app/ProgramConfig.h
         app/Timer.h
         app/SimulationBuffer.h
+        app/ExtendedTotalistic/ExtendedTotalistic.ixx
+        app/ExtendedTotalistic/ExtendedTotalisticSimulation.h
+        app/ExtendedTotalistic/ExtendedTotalisticSimulationBuffer.h
+        app/ExtendedTotalistic/ExtendedTotalisticSimulaitonView.h
 )
 
 target_include_directories(${PROJECT_NAME} PRIVATE external/boost-di/include)

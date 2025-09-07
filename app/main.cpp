@@ -3,6 +3,7 @@
 #include "SimulationView.h"
 #include "Timer.h"
 
+import ExtendedTotalistic;
 import ExtendedWolfram;
 
 using namespace Program;
@@ -11,29 +12,32 @@ int main() {
     const auto config = ProgramConfig(
         1280,
         880,
-        4,
-        4,
+        1,
+        1,
         500
     );
 
-    constexpr int neighborCount = 6;
+    constexpr int neighborCount = 7;
     constexpr bool isRandomFirst = true;
     unsigned long long rule = 0;
+    const unsigned long long maxRule = std::pow(2, neighborCount + 1);
 
     std::random_device rd;
     std::mt19937_64 gen(rd());
+    std::uniform_int_distribution<int> dist(0, maxRule);
 
-    auto buffer = std::make_shared<ExtendedWolframSimulationBuffer>(
+    auto buffer = std::make_shared<ExtendedTotalisticSimulationBuffer>(
         config,
         neighborCount,
         rule,
         isRandomFirst
     );
 
-    std::unique_ptr<SimulationView> simulationView =
-        std::make_unique<ExtendedWolframSimulationView>(config, buffer);
+    const std::unique_ptr<SimulationView> simulationView =
+        std::make_unique<ExtendedTotalisticSimulationView>(config, buffer);
 
     Timer timer;
+    timer.SetTimeout(config.Delay());
 
     InitWindow(
         config.WindowWidth(),
@@ -43,9 +47,9 @@ int main() {
 
     while (!WindowShouldClose()) {
         if (timer.HasElapsed()) {
-            rule = gen();
+            rule = ++rule % maxRule;
 
-            buffer = std::make_shared<ExtendedWolframSimulationBuffer>(
+            buffer = std::make_shared<ExtendedTotalisticSimulationBuffer>(
                 config,
                 neighborCount,
                 rule,

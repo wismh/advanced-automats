@@ -1,35 +1,29 @@
 #pragma once
 #include <memory>
 #include <complex>
+#include <iostream>
 
 namespace Program {
 
-class ExtendedWolframSimulation {
+class ExtendedTotalisticSimulation {
     std::shared_ptr<int[]> _state;
     std::shared_ptr<int[]> _updatedState;
 
-    std::shared_ptr<int[]> _neighbors;
-
     int _width;
     int _neighborsCount;
-    int _casesCount;
     unsigned long long _rule;
 
-    void UpdateState(const int p, const int j) const {
+    int CountAliveNeighbors(const int p) const {
         const int half = _neighborsCount / 2;
-        bool fits = true;
+        int count = 0;
 
-        for (int i = 0; i < _neighborsCount; i++)
-            if ((*this)[p - i + half] != _neighbors[j * _neighborsCount + i]) {
-                fits = false;
-                break;
-            }
+        for (int i = 0; i < _neighborsCount; ++i)
+            count += (*this)[p - i + half];
 
-        if (fits)
-            _updatedState[p] = (_rule >> j) & 1;
+        return count;
     }
 public:
-    ExtendedWolframSimulation(
+    ExtendedTotalisticSimulation(
         const int width,
         const int neighborsCount,
         const unsigned long long rule,
@@ -42,13 +36,6 @@ public:
     {
         SetStatePtr(state);
         SetUpdatedStatePtr(updatedState);
-
-        _casesCount = std::pow(2, _neighborsCount);
-        _neighbors = std::shared_ptr<int[]>(new int[_casesCount * _neighborsCount]);
-
-        for (int j = 0; j < _casesCount; ++j)
-            for (int k = 0; k < _neighborsCount; ++k)
-                _neighbors[j * _neighborsCount + k] = (j >> k) & 1;
     }
 
     void SetStatePtr(const std::shared_ptr<int[]>& state) {
@@ -75,9 +62,12 @@ public:
     }
 
     void CalcNextState() const {
-        for (int i = 0; i < _width; ++i)
-            for (int j = 0; j < _casesCount; ++j)
-                UpdateState(i, j);
+        for (int i = 0; i < _width; ++i) {
+            const int aliveNeighbors = CountAliveNeighbors(i);
+            const bool isShouldBeAlive = (_rule >> aliveNeighbors) & 1;
+
+            _updatedState[i] = isShouldBeAlive;
+        }
     }
 };
 
