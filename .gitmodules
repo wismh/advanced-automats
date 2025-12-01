@@ -4,6 +4,12 @@
 [submodule "external/boost-di"]
 	path = external/boost-di
 	url = https://github.com/boost-experimental/di.git
-[submodule "external/raygui"]
-    path = external/raygui
-    url = https://github.com/raysan5/raygui.git
+[submodule "external/imgui"]
+	path = external/imgui
+	url = https://github.com/ocornut/imgui.git
+[submodule "extern/rlImGui"]
+	path = extern/rlImGui
+	url = https://github.com/raylib-extras/rlImGui
+[submodule "external/rlImGui"]
+	path = external/rlImGui
+	url = https://github.com/raylib-extras/rlImGui

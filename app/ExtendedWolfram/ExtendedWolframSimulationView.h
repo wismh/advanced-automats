@@ -32,7 +32,7 @@ namespace Program {
                             offsetY + y * _config.CellHeight(),
                             _config.CellWidth(),
                             _config.CellHeight(),
-                            BLACK
+                            BLUE
                         );
         }
     };
