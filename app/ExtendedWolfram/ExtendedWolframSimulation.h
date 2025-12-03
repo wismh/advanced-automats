@@ -4,51 +4,58 @@
 
 namespace Program {
 
+class SimulationConfig {
+public:
+    virtual ~SimulationConfig() = default;
+};
+
+class ExtendedWolframSimulationConfig final : public SimulationConfig {
+public:
+    int Width = 64;
+    int Neighbors = 3;
+    int Rule = 90;
+    bool IsLoop = true;
+};
+
 class ExtendedWolframSimulation {
     std::shared_ptr<int[]> _state;
     std::shared_ptr<int[]> _updatedState;
 
     std::shared_ptr<int[]> _neighbors;
 
-    int _width;
-    int _neighborsCount;
     int _casesCount;
-    unsigned long long _rule;
+    std::shared_ptr<ExtendedWolframSimulationConfig> _config;
 
     void UpdateState(const int p, const int j) const {
-        const int half = _neighborsCount / 2;
+        const int half = _config->Neighbors / 2;
         bool fits = true;
 
-        for (int i = 0; i < _neighborsCount; i++)
-            if ((*this)[p - i + half] != _neighbors[j * _neighborsCount + i]) {
+        for (int i = 0; i <  _config->Neighbors; i++)
+            if ((*this)[p - i + half] != _neighbors[j *  _config->Neighbors + i]) {
                 fits = false;
                 break;
             }
 
         if (fits)
-            _updatedState[p] = (_rule >> j) & 1;
+            _updatedState[p] = (_config->Rule >> j) & 1;
     }
 public:
     ExtendedWolframSimulation(
-        const int width,
-        const int neighborsCount,
-        const unsigned long long rule,
+        const std::shared_ptr<ExtendedWolframSimulationConfig> config,
         const std::shared_ptr<int[]> &state,
         const std::shared_ptr<int[]> &updatedState
     ) :
-        _width(width),
-        _neighborsCount(neighborsCount),
-        _rule(rule)
+        _config(config)
     {
         SetStatePtr(state);
         SetUpdatedStatePtr(updatedState);
 
-        _casesCount = std::pow(2, _neighborsCount);
-        _neighbors = std::shared_ptr<int[]>(new int[_casesCount * _neighborsCount]);
+        _casesCount = std::pow(2, _config->Neighbors);
+        _neighbors = std::shared_ptr<int[]>(new int[_casesCount * _config->Neighbors]);
 
         for (int j = 0; j < _casesCount; ++j)
-            for (int k = 0; k < _neighborsCount; ++k)
-                _neighbors[j * _neighborsCount + k] = (j >> k) & 1;
+            for (int k = 0; k < _config->Neighbors; ++k)
+                _neighbors[j * _config->Neighbors + k] = (j >> k) & 1;
     }
 
     void SetStatePtr(const std::shared_ptr<int[]>& state) {
@@ -70,12 +77,12 @@ public:
     }
 
     int operator[](const int index) const {
-        const int idx = (index + _width) % _width;
+        const int idx = (index + _config->Width) % _config->Width;
         return _state[idx];
     }
 
     void CalcNextState() const {
-        for (int i = 0; i < _width; ++i)
+        for (int i = 0; i < _config->Width; ++i)
             for (int j = 0; j < _casesCount; ++j)
                 UpdateState(i, j);
     }

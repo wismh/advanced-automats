@@ -1,4 +1,5 @@
 #include <imgui_internal.h>
+#include <iostream>
 #include <memory>
 #include <string>
 
@@ -10,10 +11,24 @@
 
 using namespace Program;
 
-class SimulationFlowConfig {
+class SimulationFlowConfig final {
 public:
     int Speed = 1;
     bool IsPaused = true;
+};
+
+class CameraModel final {
+public:
+    float Zoom = 0.f;
+    ImVec2 Position = {};
+};
+
+class ApplicationModel final {
+public:
+    std::shared_ptr<SimulationBuffer> SimulationBuffer;
+    std::shared_ptr<SimulationFlowConfig> SimulationFlowConfig;
+    std::shared_ptr<SimulationConfig> SimulationConfig;
+    std::shared_ptr<CameraModel> CameraModel;
 };
 
 class SettingsContentView {
@@ -92,32 +107,36 @@ protected:
     }
 };
 
-class ControlPanel final {
+class ControlPanelView final {
     static const float k_buttonWidth;
 
+    float _width;
     float _height;
+    float _buttonSize;
+    ImGuiContext* _context = nullptr;
+
     std::shared_ptr<SettingsPanelView> _settingsPanelView;
-    std::shared_ptr<SimulationFlowConfig> _simulationFlowConfig;
+    std::shared_ptr<ApplicationModel> _applicationModel;
 public:
-    explicit ControlPanel(
+    explicit ControlPanelView(
         const int height,
         const std::shared_ptr<SettingsPanelView>& settingsPanelView,
-        const std::shared_ptr<SimulationFlowConfig>& simulationFlowConfig
+        const std::shared_ptr<ApplicationModel>& applicationModel
     ) {
         _height = static_cast<float>(height);
         _settingsPanelView = settingsPanelView;
-        _simulationFlowConfig = simulationFlowConfig;
+        _applicationModel = applicationModel;
+
+        _context = ImGui::GetCurrentContext();
+
+        const auto screenWidth = static_cast<float>(GetScreenWidth());
+        _width = screenWidth - _settingsPanelView->Width();
+        _buttonSize = _height - _context->Style.WindowPadding.y * 2;
     }
 
     void Draw() const {
-        const auto screenWidth = static_cast<float>(GetScreenWidth());
-        const auto width = screenWidth - _settingsPanelView->Width();
-
-        const auto context = ImGui::GetCurrentContext();
-        const float buttonSize = _height - context->Style.WindowPadding.y * 2;
-
         ImGui::SetNextWindowPos(ImVec2(0.0f, 0.0f));
-        ImGui::SetNextWindowSize(ImVec2(width, _height));
+        ImGui::SetNextWindowSize(ImVec2(_width, _height));
 
         ImGui::Begin("Control Panel", nullptr,
                      ImGuiWindowFlags_NoMove |
@@ -125,33 +144,54 @@ public:
                      ImGuiWindowFlags_NoCollapse |
                      ImGuiWindowFlags_NoDecoration);
 
-        ImGui::SameLine();
-        ImGui::SetCursorPosY(context->Style.WindowPadding.y);
-        TogglePlayPause(_simulationFlowConfig->IsPaused, buttonSize);
-
-        ImGui::SameLine();
-        ImGui::SetCursorPosY(context->Style.WindowPadding.y);
-        ImGui::Button("Clear", ImVec2(k_buttonWidth, buttonSize));
-
-        ImGui::SameLine();
-        ImGui::SetCursorPosY(context->Style.WindowPadding.y);
-        ImGui::Button("Exit", ImVec2(k_buttonWidth, buttonSize));
-
-        ImGui::SameLine();
-        static const float textWidth = ImGui::CalcTextSize("Speed:").x + 200 + 25;
-        ImGui::SetCursorPosX(width - textWidth);
-        ImGui::SetCursorPosY((_height - ImGui::GetFrameHeight()) * 0.5f);
-        ImGui::Text("Speed:");
-
-        ImGui::SameLine();
-        ImGui::SetCursorPosY((_height - ImGui::GetFrameHeight()) * 0.5f);
-        ImGui::PushItemWidth(200.0f);
-        ImGui::SliderInt("##speed", &_simulationFlowConfig->Speed, 1, 100);
-        ImGui::PopItemWidth();
+        DrawPlayPause();
+        DrawClearButton();
+        DrawExitButton();
+        DrawSpeedSlider();
 
         ImGui::End();
     }
 private:
+    void DrawPlayPause() const {
+        ImGui::SameLine();
+        ImGui::SetCursorPosY(_context->Style.WindowPadding.y);
+        TogglePlayPause(_applicationModel->SimulationFlowConfig->IsPaused, _buttonSize);
+    }
+
+    void DrawClearButton() const {
+        ImGui::SameLine();
+        ImGui::SetCursorPosY(_context->Style.WindowPadding.y);
+        ImGui::Button("Clear", ImVec2(k_buttonWidth, _buttonSize));
+    }
+
+    void DrawExitButton() const {
+        ImGui::SameLine();
+        ImGui::SetCursorPosY(_context->Style.WindowPadding.y);
+        ImGui::Button("Exit", ImVec2(k_buttonWidth, _buttonSize));
+    }
+
+    void DrawSpeedSlider() const {
+        static constexpr auto sliderWidth = 200;
+        static const auto text = "Speed:";
+        static const float textWidth = ImGui::CalcTextSize(text).x + sliderWidth + 25;
+        static const float yPos = (_height - ImGui::GetFrameHeight()) * 0.5f;
+
+        ImGui::SameLine();
+        ImGui::SetCursorPosX(_width - textWidth);
+        ImGui::SetCursorPosY(yPos);
+        ImGui::Text(text);
+
+        ImGui::SameLine();
+        ImGui::SetCursorPosY(yPos);
+        ImGui::PushItemWidth(sliderWidth);
+        ImGui::SliderInt(
+            "##speed",
+            &_applicationModel->SimulationFlowConfig->Speed,
+            1, 100
+        );
+        ImGui::PopItemWidth();
+    }
+
     static bool TogglePlayPause(bool& playing, const float size) {
         const char* icon = playing ? "Play" : "Pause";
 
@@ -162,66 +202,110 @@ private:
     }
 };
 
-const float ControlPanel::k_buttonWidth = 100;
+const float ControlPanelView::k_buttonWidth = 100;
 
-int main()
-{
-    InitWindow(1280, 960, "Cellular Automata Simulations");
-    SetTargetFPS(60);
+class Application final {
+    std::shared_ptr<ApplicationModel> _applicationModel;
 
-    rlImGuiSetup(true);
+    std::shared_ptr<SettingsPanelView> _settingsPanelView;
+    std::shared_ptr<ControlPanelView> _controlPanelView;
 
-    ImGuiIO& io = ImGui::GetIO();
-    io.IniFilename = nullptr;
+    std::shared_ptr<SimulationView> _simulationView;
 
-    auto flowConfig = std::make_shared<SimulationFlowConfig>();
+    Timer _timer;
+public:
+    Application(
+        const int windowWidth,
+        const int windowHeight,
+        const std::string& windowTitle
+    ) {
+        InitImGui(windowWidth, windowHeight, windowTitle);
+        InitComponents();
+    }
 
-    SettingsPanelView settingsPanelView(300);
-    settingsPanelView.SetContentView(std::make_shared<ExtendedWolframSettingsView>());
+    ~Application() {
+        rlImGuiShutdown();
+        CloseWindow();
+    }
 
-    const ControlPanel controlPanel(
-        50,
-        std::make_shared<SettingsPanelView>(settingsPanelView),
-        flowConfig
-    );
+    int Loop() {
+        while (!WindowShouldClose())
+        {
+            Update();
+            Draw();
+        }
 
-    const ProgramConfig config(1280, 960, 32, 32, 10);
+        return 0;
+    }
+private:
+    void Update() {
+        const auto buffer = _applicationModel->SimulationBuffer;
+        const auto flowConfig =_applicationModel->SimulationFlowConfig;
 
-    auto buffer = std::make_shared<ExtendedWolframSimulationBuffer>(
-       config,
-       3,
-       90,
-       true
-   );
+        if (_timer.HasElapsed() && !flowConfig->IsPaused) {
+            buffer->CalcNextState();
+            _timer.SetTimeout(2000 - flowConfig->Speed * 20);
+        }
+    }
 
-    const std::unique_ptr<SimulationView> simulationView =
-        std::make_unique<ExtendedWolframSimulationView>(config, buffer);
-
-    Timer timer;
-
-    while (!WindowShouldClose())
-    {
+    void Draw() const {
         BeginDrawing();
         ClearBackground(BLACK);
 
         rlImGuiBegin();
 
-        controlPanel.Draw();
-        settingsPanelView.Draw();
-
-        if (timer.HasElapsed() && !flowConfig->IsPaused) {
-            buffer->CalcNextState();
-            timer.SetTimeout(1000 - flowConfig->Speed * 10);
-        }
-
-        simulationView->Draw(50);
+        _settingsPanelView->Draw();
+        _controlPanelView->Draw();
+        _simulationView->Draw(50);
 
         rlImGuiEnd();
         EndDrawing();
     }
+private:
+    static void InitImGui(
+        const int windowWidth,
+        const int windowHeight,
+        const std::string& windowTitle
+    ) {
+        InitWindow(windowWidth, windowHeight, windowTitle.c_str());
+        SetTargetFPS(60);
 
-    rlImGuiShutdown();
-    CloseWindow();
+        rlImGuiSetup(true);
 
-    return 0;
+        ImGuiIO& io = ImGui::GetIO();
+        io.IniFilename = nullptr;
+
+        std::cout << "[Application] Init ImGui Successfully" << std::endl;
+    }
+
+    void InitComponents() {
+        // Data
+        _applicationModel = std::make_shared<ApplicationModel>();
+        _applicationModel->SimulationFlowConfig = std::make_shared<SimulationFlowConfig>();
+        _applicationModel->SimulationConfig = std::make_shared<ExtendedWolframSimulationConfig>();
+        _applicationModel->SimulationBuffer = std::make_shared<ExtendedWolframSimulationBuffer>(
+            std::dynamic_pointer_cast<ExtendedWolframSimulationConfig>(_applicationModel->SimulationConfig)
+        );
+
+        std::cout << "[Application] Init Data Components Successfully" << std::endl;
+
+        // Views
+        _settingsPanelView = std::make_shared<SettingsPanelView>(300);
+        _settingsPanelView->SetContentView(std::make_shared<ExtendedWolframSettingsView>());
+        _controlPanelView = std::make_shared<ControlPanelView>(
+            50, _settingsPanelView, _applicationModel
+        );
+        _simulationView = std::make_shared<ExtendedWolframSimulationView>(
+            std::static_pointer_cast<ExtendedWolframSimulationConfig>(_applicationModel->SimulationConfig),
+            std::static_pointer_cast<ExtendedWolframSimulationBuffer>(_applicationModel->SimulationBuffer)
+        );
+
+        std::cout << "[Application] Init Views Components Successfully" << std::endl;
+    }
+};
+
+int main()
+{
+    Application app(1280, 960, "Cellular Automata Simulations");
+    return app.Loop();
 }

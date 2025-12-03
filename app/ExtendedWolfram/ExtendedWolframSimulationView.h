@@ -7,10 +7,10 @@
 namespace Program {
     class ExtendedWolframSimulationView final : public SimulationView {
         std::shared_ptr<ExtendedWolframSimulationBuffer> _buffer;
-        ProgramConfig _config;
+        std::shared_ptr<ExtendedWolframSimulationConfig> _config;
     public:
         ExtendedWolframSimulationView(
-            const ProgramConfig& config,
+            const std::shared_ptr<ExtendedWolframSimulationConfig>& config,
             const std::shared_ptr<ExtendedWolframSimulationBuffer>& buffer
         ) :
             _config(config)
@@ -25,13 +25,13 @@ namespace Program {
         void Draw(int offsetY) override {
             const auto buffer =  _buffer->GetBuffer();
             for (int y = 0; y < buffer.size(); ++y)
-                for (int x = 0; x < _config.GridWidth(); ++x)
+                for (int x = 0; x < _config->Width; ++x)
                     if (buffer[y][x] == 1)
                         DrawRectangle(
-                            x * _config.CellWidth(),
-                            offsetY + y * _config.CellHeight(),
-                            _config.CellWidth(),
-                            _config.CellHeight(),
+                            x * 32,
+                            offsetY + y * 32,
+                            32,
+                            32,
                             BLUE
                         );
         }
