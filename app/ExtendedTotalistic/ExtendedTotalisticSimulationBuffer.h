@@ -59,11 +59,11 @@ public:
         );
     }
 
-    bool IsFull() const override {
+    bool IsFull() const {
         return _currentLine >= _buffer.size() - 1;
     }
 
-    void CalcNextState() override {
+    void CalcNextState() {
         if (IsFull())
             return;
 

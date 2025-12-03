@@ -6,8 +6,7 @@ class SimulationBuffer {
 public:
     virtual ~SimulationBuffer() = default;
 
-    virtual bool IsFull() const = 0;
-    virtual void CalcNextState() = 0;
+    virtual void Clear() = 0;
 };
 
 }

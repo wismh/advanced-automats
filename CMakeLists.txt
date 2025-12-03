@@ -23,6 +23,15 @@ add_executable(${PROJECT_NAME}
         app/ExtendedTotalistic/ExtendedTotalisticSimulationBuffer.h
         app/ExtendedTotalistic/ExtendedTotalisticSimulationView.h
         ${RLIMGUI_DIR}/rlImGui.cpp
+        app/Application.h
+        app/ControlPanelView.h
+        app/ApplicationControls.h
+        app/ExtendedWolframSettingsView.h
+        app/SettingsPanelView.h
+        app/SettingsContentView.h
+        app/ApplicationModel.h
+        app/CameraModel.h
+        app/SimulationFlowConfig.h
 )
 
 target_include_directories(
