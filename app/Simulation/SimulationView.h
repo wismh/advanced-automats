@@ -1,7 +1,7 @@
 #pragma once
 #include <memory>
 
-#include "SimulationBuffer.h"
+#include "./SimulationBuffer.h"
 
 namespace Program {
     class SimulationView {

@@ -1,6 +1,4 @@
 #pragma once
-#include <memory>
-
 #include "SettingsContentView.h"
 
 namespace Program {
@@ -22,23 +20,23 @@ public:
     }
 
     void Draw() const {
+        static const auto title = "Simulation Settings";
+        static const float textWidth = ImGui::CalcTextSize(title).x;
         const auto screenWidth = static_cast<float>(GetScreenWidth());
         const auto screenHeight = static_cast<float>(GetScreenHeight());
 
         ImGui::SetNextWindowPos(ImVec2(screenWidth - _width, 0.0f));
         ImGui::SetNextWindowSize(ImVec2(_width, screenHeight));
 
-        ImGui::Begin("Settings Panel", nullptr,
+        ImGui::Begin("#settings", nullptr,
                      ImGuiWindowFlags_NoMove |
                      ImGuiWindowFlags_NoResize |
                      ImGuiWindowFlags_NoCollapse |
                      ImGuiWindowFlags_NoDecoration);
 
-        static const float textWidth = ImGui::CalcTextSize("Simulation settings").x;
         const float avail = ImGui::GetContentRegionAvail().x;
-
         ImGui::SetCursorPosX((avail - textWidth) * 0.6f);
-        ImGui::Text("Simulation settings");
+        ImGui::Text(title);
 
         ImGui::Text("");
 

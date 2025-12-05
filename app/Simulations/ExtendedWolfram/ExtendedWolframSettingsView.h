@@ -1,7 +1,7 @@
 #pragma once
 #include <memory>
 
-#include "ExtendedWolfram/ExtendedWolframSimulationBuffer.h"
+#include "./ExtendedWolframSimulationBuffer.h"
 
 namespace Program {
 

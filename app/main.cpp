@@ -1,8 +1,9 @@
-#include "Application.h"
+#include "Application/Application.h"
+#include "SimulationFlow/SimulationFlowPanelView.h"
 
 using namespace Program;
 
-const float ControlPanelView::k_buttonWidth = 100;
+const float SimulationFlowPanelView::k_buttonWidth = 100;
 
 int main()
 {

@@ -4,15 +4,15 @@
 
 #include "ApplicationControls.h"
 #include "ApplicationModel.h"
-#include "ControlPanelView.h"
-#include "SettingsPanelView.h"
-#include "SimulationFlowConfig.h"
-#include "SimulationView.h"
+#include "SimulationFlow/SimulationFlowPanelView.h"
+#include "Settings/SettingsPanelView.h"
+#include "SimulationFlow/SimulationFlowConfig.h"
+#include "Simulation/SimulationView.h"
 #include "Timer.h"
 
-#include "ExtendedWolframSettingsView.h"
-#include "ExtendedWolfram/ExtendedWolframSimulation.h"
-#include "ExtendedWolfram/ExtendedWolframSimulationView.h"
+#include "Simulations/ExtendedWolfram/ExtendedWolframSettingsView.h"
+#include "Simulations/ExtendedWolfram/ExtendedWolframSimulation.h"
+#include "Simulations/ExtendedWolfram/ExtendedWolframSimulationView.h"
 
 namespace Program {
 
@@ -20,7 +20,7 @@ class Application final {
     std::shared_ptr<ApplicationModel> _applicationModel;
 
     std::shared_ptr<SettingsPanelView> _settingsPanelView;
-    std::shared_ptr<ControlPanelView> _controlPanelView;
+    std::shared_ptr<SimulationFlowPanelView> _controlPanelView;
 
     std::shared_ptr<SimulationView> _simulationView;
 
@@ -120,7 +120,7 @@ private:
         _settingsPanelView->SetContentView(std::make_shared<ExtendedWolframSettingsView>(
             std::static_pointer_cast<ExtendedWolframSimulationConfig>(_applicationModel->SimulationConfig)
         ));
-        _controlPanelView = std::make_shared<ControlPanelView>(
+        _controlPanelView = std::make_shared<SimulationFlowPanelView>(
             50, _settingsPanelView, _applicationModel, _applicationControls
         );
         _simulationView = std::make_shared<ExtendedWolframSimulationView>(

@@ -1,8 +1,8 @@
 #pragma once
-#include "CameraModel.h"
-#include "SimulationBuffer.h"
-#include "SimulationFlowConfig.h"
-#include "ExtendedWolfram/ExtendedWolframSimulationBuffer.h"
+#include "Camera/CameraModel.h"
+#include "Simulation/SimulationBuffer.h"
+#include "SimulationFlow/SimulationFlowConfig.h"
+#include "Simulations/ExtendedWolfram/ExtendedWolframSimulationBuffer.h"
 
 namespace Program {
 
@@ -14,6 +14,5 @@ public:
     std::shared_ptr<SimulationConfig> SimulationConfig;
     std::shared_ptr<CameraModel> CameraModel;
 };
-
 
 }

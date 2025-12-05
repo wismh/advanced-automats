@@ -1,12 +1,10 @@
 #pragma once
 #include <imgui_internal.h>
-#include <memory>
-
-#include "SettingsPanelView.h"
+#include "Settings/SettingsPanelView.h"
 
 namespace Program {
 
-class ControlPanelView final {
+class SimulationFlowPanelView final {
     static const float k_buttonWidth;
 
     float _width;
@@ -18,7 +16,7 @@ class ControlPanelView final {
     std::shared_ptr<ApplicationModel> _applicationModel;
     std::shared_ptr<ApplicationControls> _applicationControls;
 public:
-    explicit ControlPanelView(
+    explicit SimulationFlowPanelView(
         const int height,
         const std::shared_ptr<SettingsPanelView>& settingsPanelView,
         const std::shared_ptr<ApplicationModel>& applicationModel,
@@ -62,12 +60,14 @@ private:
         TogglePlayPause(_applicationModel->SimulationFlowConfig->IsPaused, _buttonSize);
     }
 
+    [[nodiscard]]
     bool DrawClearButton() const {
         ImGui::SameLine();
         ImGui::SetCursorPosY(_context->Style.WindowPadding.y);
         return ImGui::Button("Clear", ImVec2(k_buttonWidth, _buttonSize));
     }
 
+    [[nodiscard]]
     bool DrawExitButton() const {
         ImGui::SameLine();
         ImGui::SetCursorPosY(_context->Style.WindowPadding.y);

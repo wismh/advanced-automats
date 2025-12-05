@@ -2,7 +2,7 @@
 #include <random>
 #include <vector>
 
-#include "../SimulationBuffer.h"
+#include "../../Simulation/SimulationBuffer.h"
 
 namespace Program {
 
