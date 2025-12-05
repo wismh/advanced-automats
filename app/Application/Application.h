@@ -8,6 +8,7 @@
 #include "Settings/SettingsPanelView.h"
 #include "SimulationFlow/SimulationFlowConfig.h"
 #include "Simulation/SimulationView.h"
+#include "Camera/CameraControls.h"
 #include "Timer.h"
 
 #include "Simulations/ExtendedWolfram/ExtendedWolframSettingsView.h"
@@ -24,8 +25,13 @@ class Application final {
 
     std::shared_ptr<SimulationView> _simulationView;
 
+    std::shared_ptr<CameraControls>  _cameraControls;
     std::shared_ptr<ApplicationControls> _applicationControls;
     std::shared_ptr<ExtendedWolframSimulation> _simulation;
+
+    std::vector<std::shared_ptr<ITickable>> _tickables{};
+    std::vector<std::shared_ptr<IPointerDownHandler>> _pointerDownHandlers{};
+    std::vector<std::shared_ptr<IPointerUpHandler>> _pointerUpHandlers{};
 
     Timer _timer;
 public:
@@ -61,19 +67,38 @@ private:
             _simulation->CalcNextState();
             _timer.SetTimeout(2000 - flowConfig->Speed * 20);
         }
+
+        for (const auto& tickable : _tickables)
+            tickable->Tick();
+
+        if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
+            const auto& position = GetMousePosition();
+            for (const auto& handler : _pointerDownHandlers)
+                handler->HandlePointerDown(position);
+        }
+
+        if (IsMouseButtonReleased(MOUSE_LEFT_BUTTON)) {
+            const auto& position = GetMousePosition();
+            for (const auto& handler : _pointerUpHandlers)
+                handler->HandlePointerUp(position);
+        }
     }
 
     void Draw() const {
         BeginDrawing();
         ClearBackground(BLACK);
 
+        BeginMode2D(*_applicationModel->CameraModel);
+        _simulationView->Draw();
+        EndMode2D();
+
         rlImGuiBegin();
 
         _settingsPanelView->Draw();
         _controlPanelView->Draw();
-        _simulationView->Draw(50);
 
         rlImGuiEnd();
+
         EndDrawing();
     }
 private:
@@ -96,6 +121,7 @@ private:
     void InitComponents() {
         // Data
         _applicationModel = std::make_shared<ApplicationModel>();
+        _applicationModel->CameraModel = std::make_shared<Camera2D>();
         _applicationModel->SimulationFlowConfig = std::make_shared<SimulationFlowConfig>();
         _applicationModel->SimulationConfig = std::make_shared<ExtendedWolframSimulationConfig>();
         _applicationModel->SimulationBuffer = std::make_shared<ExtendedWolframSimulationBuffer>(
@@ -112,6 +138,13 @@ private:
             std::static_pointer_cast<ExtendedWolframSimulationConfig>(_applicationModel->SimulationConfig),
             std::static_pointer_cast<ExtendedWolframSimulationBuffer>(_applicationModel->SimulationBuffer)
         );
+
+        _cameraControls = std::make_shared<CameraControls>(
+            _applicationModel->CameraModel
+        );
+        _tickables.emplace_back(_cameraControls);
+        _pointerDownHandlers.emplace_back(_cameraControls);
+        _pointerUpHandlers.emplace_back(_cameraControls);
 
         std::cout << "[Application] Init Controls Components Successfully" << std::endl;
 

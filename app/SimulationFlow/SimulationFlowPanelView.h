@@ -49,6 +49,8 @@ public:
             _applicationControls->Clear();
         if (DrawExitButton())
             _applicationControls->Exit();
+        if (DrawResetCameraButton())
+            _applicationControls->ResetCamera();
         DrawSpeedSlider();
 
         ImGui::End();
@@ -72,6 +74,13 @@ private:
         ImGui::SameLine();
         ImGui::SetCursorPosY(_context->Style.WindowPadding.y);
         return ImGui::Button("Exit", ImVec2(k_buttonWidth, _buttonSize));
+    }
+
+    [[nodiscard]]
+    bool DrawResetCameraButton() const {
+        ImGui::SameLine();
+        ImGui::SetCursorPosY(_context->Style.WindowPadding.y);
+        return ImGui::Button("Reset Camera", ImVec2(k_buttonWidth*1.5f, _buttonSize));
     }
 
     void DrawSpeedSlider() const {

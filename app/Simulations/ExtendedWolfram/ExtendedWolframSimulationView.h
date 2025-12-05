@@ -13,9 +13,9 @@ public:
     ExtendedWolframSimulationView(
         const std::shared_ptr<ExtendedWolframSimulationConfig>& config,
         const std::shared_ptr<ExtendedWolframSimulationBuffer>& buffer
-    ) :
-        _config(config)
-    {
+    ) {
+        _config = config;
+
         SetBuffer(buffer);
     }
 
@@ -23,16 +23,16 @@ public:
         _buffer = std::dynamic_pointer_cast<ExtendedWolframSimulationBuffer>(buffer);
     }
 
-    void Draw(const int offsetY) override {
+    void Draw() override {
         const auto buffer =  _buffer->GetBuffer();
         for (int y = 0; y < buffer.size(); ++y)
             for (int x = 0; x < _config->Width; ++x)
                 if (buffer[y][x] == 1)
                     DrawRectangle(
-                        x * 32,
-                        offsetY + y * 32,
-                        32,
-                        32,
+                        x,
+                        y,
+                        1,
+                        1,
                         BLUE
                     );
     }

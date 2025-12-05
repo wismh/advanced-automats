@@ -12,6 +12,7 @@ public:
         const std::shared_ptr<ApplicationModel>& applicationModel
     ) {
         _applicationModel = applicationModel;
+        ResetCamera();
     }
 public:
     void Clear() const {
@@ -20,6 +21,12 @@ public:
 
     void Exit() const {
         _applicationModel->Running = false;
+    }
+
+    void ResetCamera() const {
+        _applicationModel->CameraModel->offset = {0, 50};
+        _applicationModel->CameraModel->zoom = 15.f;
+        _applicationModel->CameraModel->target = {};
     }
 };
 

@@ -25,8 +25,10 @@ add_executable(${PROJECT_NAME}
         app/Settings/SettingsPanelView.h
         app/Settings/SettingsContentView.h
         app/Application/ApplicationModel.h
-        app/Camera/CameraModel.h
         app/SimulationFlow/SimulationFlowConfig.h
+        app/Camera/CameraControls.h
+        app/ServiceSystem/ITickable.h
+        app/ServiceSystem/IPointerDownHandler.h
 )
 
 target_include_directories(

@@ -9,6 +9,6 @@ namespace Program {
         virtual ~SimulationView() = default;
 
         virtual void SetBuffer(const std::shared_ptr<SimulationBuffer>& buffer) = 0;
-        virtual void Draw(int offsetY) = 0;
+        virtual void Draw() = 0;
     };
 }

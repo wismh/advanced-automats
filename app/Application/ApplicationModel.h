@@ -1,5 +1,4 @@
 #pragma once
-#include "Camera/CameraModel.h"
 #include "Simulation/SimulationBuffer.h"
 #include "SimulationFlow/SimulationFlowConfig.h"
 #include "Simulations/ExtendedWolfram/ExtendedWolframSimulationBuffer.h"
@@ -12,7 +11,7 @@ public:
     std::shared_ptr<SimulationBuffer> SimulationBuffer;
     std::shared_ptr<SimulationFlowConfig> SimulationFlowConfig;
     std::shared_ptr<SimulationConfig> SimulationConfig;
-    std::shared_ptr<CameraModel> CameraModel;
+    std::shared_ptr<Camera2D> CameraModel;
 };
 
 }
