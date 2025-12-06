@@ -10,19 +10,27 @@ add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/external/raylib)
 
 add_executable(${PROJECT_NAME}
         app/main.cpp
-        app/ExtendedWolfram/ExtendedWolframSimulationView.h
-        app/ExtendedWolfram/ExtendedWolframSimulationBuffer.h
-        app/ExtendedWolfram/ExtendedWolframSimulation.h
-        app/ExtendedWolfram/ExtendedWolfram.ixx
-        app/SimulationView.h
-        app/ProgramConfig.h
+        app/Simulations/ExtendedWolfram/ExtendedWolframSimulationView.h
+        app/Simulations/ExtendedWolfram/ExtendedWolframSimulationBuffer.h
+        app/Simulations/ExtendedWolfram/ExtendedWolframSimulation.h
+        app/Simulations/ExtendedWolfram/ExtendedWolfram.ixx
+        app/Simulation/SimulationView.h
         app/Timer.h
-        app/SimulationBuffer.h
-        app/ExtendedTotalistic/ExtendedTotalistic.ixx
-        app/ExtendedTotalistic/ExtendedTotalisticSimulation.h
-        app/ExtendedTotalistic/ExtendedTotalisticSimulationBuffer.h
-        app/ExtendedTotalistic/ExtendedTotalisticSimulationView.h
+        app/Simulation/SimulationBuffer.h
         ${RLIMGUI_DIR}/rlImGui.cpp
+        app/Application/Application.h
+        app/SimulationFlow/SimulationFlowPanelView.h
+        app/Application/ApplicationControls.h
+        app/Simulations/ExtendedWolfram/ExtendedWolframSettingsView.h
+        app/Settings/SettingsPanelView.h
+        app/Settings/SettingsContentView.h
+        app/Application/ApplicationModel.h
+        app/SimulationFlow/SimulationFlowConfig.h
+        app/Camera/CameraControls.h
+        app/ServiceSystem/ITickable.h
+        app/ServiceSystem/IPointerDownHandler.h
+        app/Simulation/SimulationConfig.h
+        app/Simulations/ExtendedWolfram/ExtendedWolframSimulationConfig.h
 )
 
 target_include_directories(
