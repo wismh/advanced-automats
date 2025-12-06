@@ -1,5 +1,4 @@
 #pragma once
-#include <iostream>
 #include <memory>
 
 #include "raylib.h"
@@ -60,8 +59,8 @@ private:
         const float wheel = GetMouseWheelMove();
         _logZoom = std::clamp(
             _logZoom + wheel/10,
-            1.f,
-            100.0f
+            0.1f,
+            3.0f
         );
         _cameraModel->zoom = exp(_logZoom);
 

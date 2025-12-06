@@ -14,8 +14,10 @@ public:
         _config(config) {}
 protected:
     void DrawContent() override {
-        Field("Neighbours", "##neighbours", &_config->Neighbors);
-        Field("Rule", "##rule", &_config->Rule);
+        FieldScalar("Neighbours", "##neighbours", ImGuiDataType_U32, &_config->Neighbors);
+        FieldScalar("Rule", "##rule", ImGuiDataType_U32, &_config->Rule);
+        FieldScalar("Width", "##width", ImGuiDataType_U32, &_config->Width);
+        FieldBool("Is Looped", "##isloop", &_config->IsLoop);
     }
 };
 

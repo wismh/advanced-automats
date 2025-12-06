@@ -24,14 +24,29 @@ class ExtendedWolframSimulation final {
             }
 
         if (fits)
-            _buffer->_buffer[_buffer->_currentLine][p] = _config->Rule >> j & 1;
+            SetValue(p, _config->Rule >> j & 1);
+    }
+
+    void SetValue(const int position, const int value) const {
+        auto& buffer = _buffer->_buffer[_buffer->_currentLine];
+        if (position < 0 || position >= buffer.size())
+            return;
+
+        buffer[position] = value;
     }
 
     int operator[](const int index) const {
         const auto buffer = _buffer->_buffer[_buffer->_currentLine - 1];
-        const int idx = (index + buffer.size()) % buffer.size();
 
-        return buffer[idx];
+        if (_config->IsLoop) {
+            const int idx = (index + buffer.size()) % buffer.size();
+            return buffer[idx];
+        }
+
+        if (index < 0 || index >= buffer.size())
+            return 0;
+
+        return buffer[index];
     }
 public:
     ExtendedWolframSimulation(

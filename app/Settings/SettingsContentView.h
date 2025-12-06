@@ -16,11 +16,19 @@ private:
 protected:
     virtual void DrawContent() = 0;
 
-    static void Field(const std::string& name, const std::string& id, void* pData) {
+    static void FieldScalar(const std::string& name, const std::string& id, const ImGuiDataType type, void* pData) {
         ImGui::Text(name.c_str());
         ImGui::NextColumn();
         ImGui::SetNextItemWidth(-1);
-        ImGui::InputScalar(id.c_str(), ImGuiDataType_U32, pData);
+        ImGui::InputScalar(id.c_str(), type, pData);
+        ImGui::NextColumn();
+    }
+
+    static void FieldBool(const std::string& name, const std::string& id, bool* pData) {
+        ImGui::Text(name.c_str());
+        ImGui::NextColumn();
+        ImGui::SetNextItemWidth(-1);
+        ImGui::Checkbox(id.c_str(), pData);
         ImGui::NextColumn();
     }
 };

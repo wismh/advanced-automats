@@ -29,6 +29,8 @@ add_executable(${PROJECT_NAME}
         app/Camera/CameraControls.h
         app/ServiceSystem/ITickable.h
         app/ServiceSystem/IPointerDownHandler.h
+        app/Simulation/SimulationConfig.h
+        app/Simulations/ExtendedWolfram/ExtendedWolframSimulationConfig.h
 )
 
 target_include_directories(
